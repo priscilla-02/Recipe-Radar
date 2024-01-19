@@ -4,18 +4,8 @@
   </div>
 </template>
 <script>
-/* ============
- * Entry Point
- * ============
- *
- * The entry point of the application.
- */
-
 export default {
-  /**
-   * The name of the application.
-   */
-  name: 'VueBoilerplate',
+  name: "RecipesFinder",
 
   /**
    * Fires when the app has been mounted.
@@ -24,8 +14,8 @@ export default {
     // If the user is authenticated,
     // fetch the data from the API
     if (this.$store.state.auth.authenticated) {
-      this.$store.dispatch('account/find');
+      this.$store.dispatch("account/find");
     }
-  },
+  }
 };
 </script>

@@ -34,9 +34,6 @@
           </tbody>
         </table>
       </div>
-      <div slot="footer">
-        Made with love by Vivid Web
-      </div>
     </v-card>
   </v-layout>
 </template>
@@ -49,21 +46,21 @@
  * Page where the user can view the account information.
  */
 
-import VLayout from '@/layouts/Default.vue';
-import VCard from '@/components/Card.vue';
+import VLayout from "@/layouts/Default.vue";
+import VCard from "@/components/Card.vue";
 
 export default {
   /**
    * The name of the page.
    */
-  name: 'AccountIndex',
+  name: "AccountIndex",
 
   /**
    * The components that the page can use.
    */
   components: {
     VLayout,
-    VCard,
-  },
+    VCard
+  }
 };
 </script>
