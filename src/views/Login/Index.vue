@@ -5,7 +5,7 @@
         Filter
       </span>
       <div slot="body">
-        <form @submit.prevent="login(user)">
+        <form>
           <div class="form-group">
             <div class="input-group">
               <div class="input-group-prepend">
@@ -14,15 +14,19 @@
                 </span>
               </div>
               <input
-                v-model="user.search"
-                type="search"
+                v-model="searchTitle"
+                type="text"
                 placeholder="Search Recipes Titles"
                 class="form-control"
+                @input="filterRecipesByTitle(searchTitle)"
               />
             </div>
           </div>
           <div class="form-group">
-            <button class="btn btn-outline-primary">
+            <button
+              class="btn btn-outline-primary"
+              @click="searchRecipesByTitle"
+            >
               Search
             </button>
           </div>
@@ -35,10 +39,9 @@
             v-for="(item, index) in cuisineOptions"
           >
             <input
-              @click="handleSelectCuisine(item)"
+              @change="handleSelectCuisine(item)"
               class="form-check-input"
-              type="radio"
-              v-model="selectedCuisine"
+              type="checkbox"
               :value="item"
               :id="item"
             />
@@ -55,9 +58,9 @@
             v-for="(item, index) in mealTypeOptions"
           >
             <input
-              @click="handleSelectMealType(item)"
+              @change="handleSelectMealType(item)"
               class="form-check-input"
-              type="radio"
+              type="checkbox"
               :value="item"
               :id="item"
             />
@@ -67,7 +70,7 @@
           </div>
 
           <div>
-            Speical Diet:
+            Special Diet:
           </div>
 
           <div
@@ -75,9 +78,9 @@
             v-for="(item, index) in dietOptions"
           >
             <input
-              @click="handleSelectDiet(item)"
+              @change="handleSelectDiet(item)"
               class="form-check-input"
-              type="radio"
+              type="checkbox"
               :value="item"
               :id="item"
             />
@@ -88,6 +91,21 @@
 
           <div>
             By Ingredient:
+          </div>
+          <div
+            class="form-check form-group form-check-inline"
+            v-for="(item, index) in ingredientOptions"
+          >
+            <input
+              @change="handleSelectIngredient(item)"
+              class="form-check-input"
+              type="checkbox"
+              :value="item"
+              :id="item"
+            />
+            <label class="form-check-label" :for="index">
+              {{ item }}
+            </label>
           </div>
         </form>
       </div>
@@ -102,14 +120,23 @@
       <span slot="header">
         All Recipes
       </span>
-      <div slot="body" class="flex-wrap justify-content-center d-flex">
-        <div v-if="this.selectedCuisineResult.length === 0">
+      <div
+        slot="body"
+        class="d-flex justify-content-around align-items-center flex-wrap"
+      >
+        <div v-if="selectedRecipesGallery.length === 0 && errorMsg == ''">
           Start looking for recipes...
         </div>
-        <div v-else v-for="(item, index) in this.selectedCuisineResult">
-          <div>
-            {{ item.title }}
-            <img class="m-3" :src="item.image" />
+        <div v-else-if="errorMsg !== ''">
+          {{ this.errorMsg }}
+        </div>
+
+        <div v-else>
+          <div v-for="(item, index) in selectedRecipesGallery" :key="index">
+            <div class="d-flex flex-column">
+              <img class="m-3" :src="item.image" />
+              <span>{{ item.title }} </span>
+            </div>
           </div>
         </div>
       </div>
@@ -131,7 +158,8 @@ import axios from "axios";
 import {
   cuisineOptionsArray,
   dietOptionsArray,
-  mealTypeOptionsArray
+  mealTypeOptionsArray,
+  ingredientsOptionsArray
 } from "@/constant/constant";
 
 export default {
@@ -155,15 +183,27 @@ export default {
    */
   data() {
     return {
-      user: {
-        search: null
-      },
-      selectedCuisine: null,
-      selectedCuisineResult: [],
+      // user: {
+      //   search: null
+      // },
+      searchTitle: null,
+      errorMsg: "",
+
+      // selectedCuisine: null,
+
+      selectedRecipesGallery: [],
+
       cuisineOptions: cuisineOptionsArray,
-      selectedDietArray: [],
+      selectedCuisineArray: [],
+
       dietOptions: dietOptionsArray,
-      mealTypeOptions: mealTypeOptionsArray
+      selectedDietArray: [],
+
+      mealTypeOptions: mealTypeOptionsArray,
+      selectedMealTypeArray: [],
+
+      ingredientOptions: ingredientsOptionsArray,
+      selectedIngredientArray: []
     };
   },
 
@@ -171,29 +211,112 @@ export default {
    * The methods the page can use.
    */
   methods: {
-    /**
-     * Will log the user in.
-     *
-     * @param {Object} user The user to be logged in.
-     */
-    login(user) {
-      this.$store.dispatch("auth/login", user);
+    filterRecipesByTitle(searchTitleInput) {
+      this.searchTitle = searchTitleInput;
     },
+    async searchRecipesByTitle() {
+      const searchQuery = this.searchTitle;
+
+      try {
+        const result = await axios.get(
+          `https://api.spoonacular.com/recipes/complexSearch?apiKey=4974bdff0e5c4c27935b0870139d1e92&number=12&query=${searchQuery}`
+        );
+        if (result.data.results.length === 0) {
+          this.errorMsg = "No Matching Recipes";
+        } else {
+          this.selectedRecipesGallery = result.data.results;
+        }
+        this.searchTitle = null;
+      } catch (error) {
+        console.error(error);
+      }
+    },
+
     async handleSelectCuisine(selectedCuisine) {
-      const result = await axios.get(
-        `https://api.spoonacular.com/recipes/complexSearch?apiKey=4974bdff0e5c4c27935b0870139d1e92&cuisine=${selectedCuisine}`
-      );
-      console.log("result", result.data.results);
-      console.log(selectedCuisine);
-      this.selectedCuisineResult = result.data.results;
+      if (this.selectedCuisineArray.includes(selectedCuisine)) {
+        this.selectedCuisineArray = this.selectedCuisineArray.filter(
+          cuisine => cuisine !== selectedCuisine
+        );
+      } else {
+        this.selectedCuisineArray.push(selectedCuisine);
+      }
+
+      console.log(this.selectedCuisineArray.join(","));
+
+      const cuisineQuery = this.selectedCuisineArray.join(",");
+      try {
+        const result = await axios.get(
+          `https://api.spoonacular.com/recipes/complexSearch?apiKey=4974bdff0e5c4c27935b0870139d1e92&cuisine=${cuisineQuery}&number=12`
+        );
+        console.log("result", result.data.results);
+        this.selectedRecipesGallery = result.data.results;
+      } catch (error) {
+        console.error(error);
+      }
     },
-    handleSelectDiet(selectedDiet) {
-      console.log(selectedDiet);
-      this.selectedDietArray.push(selectedDiet);
+    async handleSelectDiet(selectedDiet) {
+      if (this.selectedDietArray.includes(selectedDiet)) {
+        this.selectedDietArray = this.selectedDietArray.filter(
+          diet => diet !== selectedDiet
+        );
+      } else {
+        this.selectedDietArray.push(selectedDiet);
+      }
       console.log(this.selectedDietArray);
+
+      const dietQuery = this.selectedDietArray.join(",");
+
+      try {
+        const result = await axios.get(
+          `https://api.spoonacular.com/recipes/complexSearch?apiKey=4974bdff0e5c4c27935b0870139d1e92&diet=${dietQuery}&number=12`
+        );
+        console.log("result", result.data.results);
+        this.selectedRecipesGallery = result.data.results;
+      } catch (error) {
+        console.error(error);
+      }
     },
-    handleSelectMealType(selectedMealType) {
-      console.log(selectedMealType);
+    async handleSelectMealType(selectedMealType) {
+      if (this.selectedMealTypeArray.includes(selectedMealType)) {
+        this.selectedMealTypeArray = this.selectedMealTypeArray.filter(
+          mealType => mealType !== selectedMealType
+        );
+      } else {
+        this.selectedMealTypeArray.push(selectedMealType);
+      }
+      console.log(this.selectedMealTypeArray);
+
+      const mealTypeQuery = this.selectedMealTypeArray.join(",");
+      try {
+        const result = await axios.get(
+          `https://api.spoonacular.com/recipes/complexSearch?apiKey=4974bdff0e5c4c27935b0870139d1e92&mealType=${mealTypeQuery}&number=12`
+        );
+        console.log("result", result.data.results);
+        this.selectedRecipesGallery = result.data.results;
+      } catch (error) {
+        console.error(error);
+      }
+    },
+    async handleSelectIngredient(selectedIngredient) {
+      if (this.selectedIngredientArray.includes(selectedIngredient)) {
+        this.selectedIngredientArray = this.selectedIngredientArray.filter(
+          ingredient => ingredient !== selectedIngredient
+        );
+      } else {
+        this.selectedIngredientArray.push(selectedIngredient);
+      }
+      console.log(this.selectedIngredientArray);
+      const ingredientQuery = this.selectedIngredientArray.join(",");
+      console.log(ingredientQuery);
+      try {
+        const result = await axios.get(
+          `https://api.spoonacular.com/recipes/complexSearch?apiKey=4974bdff0e5c4c27935b0870139d1e92&includeIngredients=${ingredientQuery}&number=12`
+        );
+        console.log("result", result.data.results);
+        this.selectedRecipesGallery = result.data.results;
+      } catch (error) {
+        console.error(error);
+      }
     }
   }
 };
