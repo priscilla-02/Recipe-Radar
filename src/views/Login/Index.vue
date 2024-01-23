@@ -110,9 +110,9 @@
         </form>
       </div>
       <div slot="footer">
-        <router-link :to="{ name: 'register.index' }">
+        <!-- <router-link :to="{ name: 'register.index' }">
           Register
-        </router-link>
+        </router-link> -->
       </div>
     </v-card>
 
@@ -133,10 +133,21 @@
 
         <div v-else>
           <div v-for="(item, index) in selectedRecipesGallery" :key="index">
-            <div class="d-flex flex-column">
-              <img class="m-3" :src="item.image" />
-              <span>{{ item.title }} </span>
-            </div>
+            <router-link
+              :to="{
+                name: 'recipes.index',
+                params: { id: item.id, recipe: item }
+              }"
+            >
+              <div class="d-flex flex-column">
+                <!-- <div
+                @click="handleSelectSingleRecipe(item.id)"
+                class="d-flex flex-column"
+              > -->
+                <img class="m-3" :src="item.image" />
+                <div>{{ item.title }}</div>
+              </div>
+            </router-link>
           </div>
         </div>
       </div>
@@ -189,8 +200,6 @@ export default {
       searchTitle: null,
       errorMsg: "",
 
-      // selectedCuisine: null,
-
       selectedRecipesGallery: [],
 
       cuisineOptions: cuisineOptionsArray,
@@ -225,6 +234,7 @@ export default {
           this.errorMsg = "No Matching Recipes";
         } else {
           this.selectedRecipesGallery = result.data.results;
+          console.log("searchRecipesByTitle", this.selectedRecipesGallery);
         }
         this.searchTitle = null;
       } catch (error) {
@@ -246,9 +256,11 @@ export default {
       const cuisineQuery = this.selectedCuisineArray.join(",");
       try {
         const result = await axios.get(
-          `https://api.spoonacular.com/recipes/complexSearch?apiKey=4974bdff0e5c4c27935b0870139d1e92&cuisine=${cuisineQuery}&number=12`
+          `https://api.spoonacular.com/recipes/complexSearch?apiKey=7983008ab9b14eb8aba5aa6aee4f5137&cuisine=${cuisineQuery}&number=12`
+          // `https://api.spoonacular.com/recipes/complexSearch?apiKey=4974bdff0e5c4c27935b0870139d1e92&cuisine=${cuisineQuery}&number=12`
         );
         console.log("result", result.data.results);
+        console.log("handleSelectCuisine", this.selectedRecipesGallery);
         this.selectedRecipesGallery = result.data.results;
       } catch (error) {
         console.error(error);
@@ -272,6 +284,7 @@ export default {
         );
         console.log("result", result.data.results);
         this.selectedRecipesGallery = result.data.results;
+        console.log("handleSelectDiet", this.selectedRecipesGallery);
       } catch (error) {
         console.error(error);
       }
@@ -293,6 +306,7 @@ export default {
         );
         console.log("result", result.data.results);
         this.selectedRecipesGallery = result.data.results;
+        console.log("handleSelectMealType", this.selectedRecipesGallery);
       } catch (error) {
         console.error(error);
       }
@@ -314,10 +328,22 @@ export default {
         );
         console.log("result", result.data.results);
         this.selectedRecipesGallery = result.data.results;
+        console.log("handleSelectIngredient", this.selectedRecipesGallery);
       } catch (error) {
         console.error(error);
       }
     }
+
+    // async handleSelectSingleRecipe(recipeId) {
+    //   try {
+    //     const result = await axios.get(
+    //       `https://api.spoonacular.com/recipes/${recipeId}/information?apiKey=4974bdff0e5c4c27935b0870139d1e92`
+    //     );
+    //     this.selectedRecipesGallery = result.data;
+    //   } catch (error) {
+    //     console.error(error);
+    //   }
+    // }
   }
 };
 </script>
