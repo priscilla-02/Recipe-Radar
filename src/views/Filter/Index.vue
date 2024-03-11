@@ -122,33 +122,53 @@
       </span>
       <div
         slot="body"
-        class="d-flex justify-content-around align-items-center flex-wrap"
+        class="bodySlot d-flex flex-wrap justify-content-center align-items-center fs-6"
       >
-        <div v-if="selectedRecipesGallery.length === 0 && errorMsg == ''">
+        <div
+          v-if="selectedRecipesGallery.length === 0 && errorMsg == ''"
+          class="text-center"
+          style="position: absolute; top: 30%; left: 50%; transform: translate(-30%, -50%); font-size: 24px"
+        >
           Start looking for recipes...
         </div>
-        <div v-else-if="errorMsg !== ''">
+        <div
+          v-else-if="errorMsg !== ''"
+          class="text-center"
+          style="position: absolute; top: 30%; left: 50%; transform: translate(-30%, -50%); font-size: 24px"
+        >
           {{ this.errorMsg }}
         </div>
 
-        <div v-else>
-          <div v-for="(item, index) in selectedRecipesGallery" :key="index">
-            <router-link
-              :to="{
-                name: 'recipes.index',
-                params: { id: item.id, recipe: item }
-              }"
-            >
-              <div class="d-flex flex-column">
-                <!-- <div
+        <div
+          v-else
+          class="flex items-center justify-center col-4 flex-wrap border-bottom border-top border-right"
+          v-for="(item, index) in selectedRecipesGallery"
+          style="height: 290px;"
+        >
+          <!-- <div v-for="(item, index) in selectedRecipesGallery" :key="index"> -->
+          <router-link
+            :to="{
+              name: 'recipes.index',
+              params: { id: item.id, recipe: item }
+            }"
+            :key="index"
+            style="text-decoration: none; color: black;"
+          >
+            <div class="flex flex-col items-center p-2">
+              <!-- <div
                 @click="handleSelectSingleRecipe(item.id)"
                 class="d-flex flex-column"
               > -->
-                <img class="m-3" :src="item.image" />
-                <div>{{ item.title }}</div>
-              </div>
-            </router-link>
-          </div>
+              <img
+                class="m-3 img-fluid "
+                style="border-radius: 20px;"
+                :src="item.image"
+              />
+              <div class="text-center mr-3">{{ item.title }}</div>
+            </div>
+          </router-link>
+          <div class="w-100"></div>
+          <!-- </div> -->
         </div>
       </div>
     </v-card>
