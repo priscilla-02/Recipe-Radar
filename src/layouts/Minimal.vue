@@ -1,11 +1,18 @@
 <template>
-  <div class="row">
-    <slot />
+  <div class="column">
+    <Navbar />
+    <div class="row">
+      <slot />
+    </div>
   </div>
 </template>
 
 <script>
+import Navbar from "@/views/Navbar/Index.vue";
 export default {
-  name: "MinimalLayout"
+  name: "MinimalLayout",
+  components: {
+    Navbar // Register the Navbar component
+  }
 };
 </script>

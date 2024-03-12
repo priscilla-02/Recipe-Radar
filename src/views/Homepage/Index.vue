@@ -1,37 +1,46 @@
 <template>
-  <v-layout class="flex-row ">
-    <v-card contextual-style="dark" class="p-2 col-3 ml-5">
-      <span slot="header">
+  <v-layout class="flex-row" id="custom-font">
+    <v-card
+      contextual-style="light"
+      class="p-2 col-3 ml-5"
+      style="background-color: #9CAF88"
+    >
+      <h1 slot="header" style="color: #9CAF88;" class="text-center">
         Filter
-      </span>
+      </h1>
       <div slot="body">
         <form>
-          <div class="form-group">
-            <div class="input-group">
-              <div class="input-group-prepend">
-                <span class="input-group-text">
-                  <i class="fa fa-envelope fa-fw" />
-                </span>
+          <div
+            class="d-flex flex-column 
+       "
+          >
+            <div class="form-group">
+              <div class="input-group">
+                <div class="input-group-prepend"></div>
+                <input
+                  v-model="searchTitle"
+                  type="text"
+                  placeholder="Recipe Name"
+                  class="form-control"
+                  style="font-size: 25px"
+                  @input="filterRecipesByTitle(searchTitle)"
+                />
               </div>
-              <input
-                v-model="searchTitle"
-                type="text"
-                placeholder="Search Recipes Titles"
-                class="form-control"
-                @input="filterRecipesByTitle(searchTitle)"
-              />
+            </div>
+
+            <div class="d-flex justify-content-start">
+              <button
+                class="btn btn-outline-secondary btn-light"
+                style="font-size: 25px;"
+                @click="searchRecipesByTitle"
+              >
+                Search
+                <i class="bi bi-search-heart"></i>
+              </button>
             </div>
           </div>
-          <div class="form-group">
-            <button
-              class="btn btn-outline-primary"
-              @click="searchRecipesByTitle"
-            >
-              Search
-            </button>
-          </div>
 
-          <div>
+          <div class="pt-5" style="font-size: 50px; text-decoration: underline">
             Cuisine:
           </div>
           <div
@@ -40,7 +49,7 @@
           >
             <input
               @change="handleSelectCuisine(item)"
-              class="form-check-input"
+              class="form-check-input custom-checkbox"
               type="checkbox"
               :value="item"
               :id="item"
@@ -50,7 +59,10 @@
             </label>
           </div>
 
-          <div>
+          <div
+            class="pt-5"
+            style="font-size: 50px; text-decoration: underline;"
+          >
             Meal Type:
           </div>
           <div
@@ -59,7 +71,7 @@
           >
             <input
               @change="handleSelectMealType(item)"
-              class="form-check-input"
+              class="form-check-input custom-checkbox"
               type="checkbox"
               :value="item"
               :id="item"
@@ -69,7 +81,7 @@
             </label>
           </div>
 
-          <div>
+          <div class="pt-5" style="font-size: 50px; text-decoration: underline">
             Special Diet:
           </div>
 
@@ -79,7 +91,7 @@
           >
             <input
               @change="handleSelectDiet(item)"
-              class="form-check-input"
+              class="form-check-input custom-checkbox"
               type="checkbox"
               :value="item"
               :id="item"
@@ -89,7 +101,7 @@
             </label>
           </div>
 
-          <div>
+          <div class="pt-5" style="font-size: 50px; text-decoration: underline">
             By Ingredient:
           </div>
           <div
@@ -98,7 +110,7 @@
           >
             <input
               @change="handleSelectIngredient(item)"
-              class="form-check-input"
+              class="form-check-input custom-checkbox"
               type="checkbox"
               :value="item"
               :id="item"
@@ -109,80 +121,116 @@
           </div>
         </form>
       </div>
-      <div slot="footer">
-        <!-- <router-link :to="{ name: 'register.index' }">
-          Register
-        </router-link> -->
-      </div>
+      <div slot="footer"></div>
     </v-card>
 
-    <v-card contextual-style="dark" class="p-2 col-8">
-      <span slot="header">
+    <v-card
+      contextual-style="light"
+      class="p-2 col-8"
+      style="background-color: #9CAF88"
+    >
+      <h1 slot="header" style="color: #9CAF88;" class="text-center">
         All Recipes
-      </span>
+      </h1>
+
       <div
         slot="body"
-        class="bodySlot d-flex flex-wrap justify-content-center align-items-center fs-6"
+        class="bodySlot d-flex flex-wrap justify-content-start align-items-center"
       >
         <div
           v-if="selectedRecipesGallery.length === 0 && errorMsg == ''"
-          class="text-center"
-          style="position: absolute; top: 30%; left: 50%; transform: translate(-30%, -50%); font-size: 24px"
+          id="message-content"
+          class="text-center text-white w-100"
         >
-          Start looking for recipes...
+          <div style="font-size: 70px">
+            Start looking for recipes...
+            <span id="custom-icon">GL</span>
+          </div>
         </div>
         <div
           v-else-if="errorMsg !== ''"
-          class="text-center"
-          style="position: absolute; top: 30%; left: 50%; transform: translate(-30%, -50%); font-size: 24px"
+          style="color: white; justify-content: center; align-items: center; text-align: center; width: 100%;"
+          id="message-content"
         >
-          {{ this.errorMsg }}
+          <h1>{{ this.errorMsg }}</h1>
         </div>
 
         <div
           v-else
-          class="flex items-center justify-center col-4 flex-wrap border-bottom border-top border-right"
+          class="flex items-center justify-center col-4 flex-wrap"
+          style="height: 420px;"
+          :class="getClass(index, selectedRecipesGallery.length)"
           v-for="(item, index) in selectedRecipesGallery"
-          style="height: 290px;"
+          :key="index"
         >
-          <!-- <div v-for="(item, index) in selectedRecipesGallery" :key="index"> -->
           <router-link
             :to="{
-              name: 'recipes.index',
+              name: 'singleRecipes.index',
               params: { id: item.id, recipe: item }
             }"
             :key="index"
-            style="text-decoration: none; color: black;"
+            style="text-decoration: none;"
           >
-            <div class="flex flex-col items-center p-2">
-              <!-- <div
-                @click="handleSelectSingleRecipe(item.id)"
-                class="d-flex flex-column"
-              > -->
+            <div class="flex flex-col items-center px-2 pt-2 pb-4">
               <img
-                class="m-3 img-fluid "
-                style="border-radius: 20px;"
+                class="mx-auto my-3 img-fluid text-center"
+                style="border-radius: 20px; display:block;"
                 :src="item.image"
               />
-              <div class="text-center mr-3">{{ item.title }}</div>
+              <div class="text-center mr-3 pt-3 pb-5 text-white">
+                {{ item.title }}
+              </div>
             </div>
           </router-link>
-          <div class="w-100"></div>
-          <!-- </div> -->
         </div>
       </div>
     </v-card>
   </v-layout>
 </template>
 
-<script>
-/* ============
- * Login Index Page
- * ============
- *
- * Page where the user can login.
- */
+<style>
+@media (max-width: 1199px) {
+  #message-content {
+    padding-top: 150px;
+  }
+}
 
+@media (min-width: 1200px) {
+  #message-content {
+    padding-top: 350px;
+  }
+}
+
+@font-face {
+  font-family: "Kitchen Restaurant";
+  src: url("../../../font/Kitchen Restaurant.otf") format("woff2");
+}
+
+#custom-font {
+  font-family: "Kitchen Restaurant", sans-serif;
+  font-size: 38px;
+  color: white;
+}
+
+@font-face {
+  font-family: "DJ Kitchen";
+  src: url("../../../font/DJ_Kitchen.ttf") format("woff2");
+}
+
+#custom-icon {
+  font-family: "DJ Kitchen", sans-serif;
+  font-size: 60px;
+  color: white;
+}
+
+.custom-checkbox {
+  width: 0.6em;
+  height: 0.6em;
+  border-radius: 50%;
+}
+</style>
+
+<script>
 import VLayout from "@/layouts/Minimal.vue";
 import VCard from "@/components/Card.vue";
 import axios from "axios";
@@ -194,29 +242,15 @@ import {
 } from "@/constant/constant";
 
 export default {
-  /**
-   * The name of the page.
-   */
-  name: "LoginIndex",
+  name: "HomepageIndex",
 
-  /**
-   * The components the page can use.
-   */
   components: {
     VLayout,
     VCard
   },
 
-  /**
-   * The data that can be used by the page.
-   *
-   * @returns {Object} The view-model data.
-   */
   data() {
     return {
-      // user: {
-      //   search: null
-      // },
       searchTitle: null,
       errorMsg: "",
 
@@ -236,13 +270,24 @@ export default {
     };
   },
 
-  /**
-   * The methods the page can use.
-   */
   methods: {
     filterRecipesByTitle(searchTitleInput) {
       this.searchTitle = searchTitleInput;
     },
+
+    getClass(index, arrayLength) {
+      const isLastInRow = (index + 1) % 3 === 0;
+      const isLastRow = index >= arrayLength - (arrayLength % 3);
+
+      if (isLastRow) {
+        return "";
+      } else if (isLastInRow) {
+        return "border-bottom";
+      } else {
+        return "border-right border-bottom";
+      }
+    },
+
     async searchRecipesByTitle() {
       const searchQuery = this.searchTitle;
 
@@ -254,7 +299,6 @@ export default {
           this.errorMsg = "No Matching Recipes";
         } else {
           this.selectedRecipesGallery = result.data.results;
-          console.log("searchRecipesByTitle", this.selectedRecipesGallery);
         }
         this.searchTitle = null;
       } catch (error) {
@@ -270,17 +314,12 @@ export default {
       } else {
         this.selectedCuisineArray.push(selectedCuisine);
       }
-
-      console.log(this.selectedCuisineArray.join(","));
-
       const cuisineQuery = this.selectedCuisineArray.join(",");
       try {
         const result = await axios.get(
-          `https://api.spoonacular.com/recipes/complexSearch?apiKey=7983008ab9b14eb8aba5aa6aee4f5137&cuisine=${cuisineQuery}&number=12`
-          // `https://api.spoonacular.com/recipes/complexSearch?apiKey=4974bdff0e5c4c27935b0870139d1e92&cuisine=${cuisineQuery}&number=12`
+          // `https://api.spoonacular.com/recipes/complexSearch?apiKey=7983008ab9b14eb8aba5aa6aee4f5137&cuisine=${cuisineQuery}&number=12`
+          `https://api.spoonacular.com/recipes/complexSearch?apiKey=4974bdff0e5c4c27935b0870139d1e92&cuisine=${cuisineQuery}&number=12`
         );
-        console.log("result", result.data.results);
-        console.log("handleSelectCuisine", this.selectedRecipesGallery);
         this.selectedRecipesGallery = result.data.results;
       } catch (error) {
         console.error(error);
@@ -294,7 +333,6 @@ export default {
       } else {
         this.selectedDietArray.push(selectedDiet);
       }
-      console.log(this.selectedDietArray);
 
       const dietQuery = this.selectedDietArray.join(",");
 
@@ -302,9 +340,7 @@ export default {
         const result = await axios.get(
           `https://api.spoonacular.com/recipes/complexSearch?apiKey=4974bdff0e5c4c27935b0870139d1e92&diet=${dietQuery}&number=12`
         );
-        console.log("result", result.data.results);
         this.selectedRecipesGallery = result.data.results;
-        console.log("handleSelectDiet", this.selectedRecipesGallery);
       } catch (error) {
         console.error(error);
       }
@@ -317,16 +353,13 @@ export default {
       } else {
         this.selectedMealTypeArray.push(selectedMealType);
       }
-      console.log(this.selectedMealTypeArray);
 
       const mealTypeQuery = this.selectedMealTypeArray.join(",");
       try {
         const result = await axios.get(
           `https://api.spoonacular.com/recipes/complexSearch?apiKey=4974bdff0e5c4c27935b0870139d1e92&mealType=${mealTypeQuery}&number=12`
         );
-        console.log("result", result.data.results);
         this.selectedRecipesGallery = result.data.results;
-        console.log("handleSelectMealType", this.selectedRecipesGallery);
       } catch (error) {
         console.error(error);
       }
@@ -339,31 +372,16 @@ export default {
       } else {
         this.selectedIngredientArray.push(selectedIngredient);
       }
-      console.log(this.selectedIngredientArray);
       const ingredientQuery = this.selectedIngredientArray.join(",");
-      console.log(ingredientQuery);
       try {
         const result = await axios.get(
           `https://api.spoonacular.com/recipes/complexSearch?apiKey=4974bdff0e5c4c27935b0870139d1e92&includeIngredients=${ingredientQuery}&number=12`
         );
-        console.log("result", result.data.results);
         this.selectedRecipesGallery = result.data.results;
-        console.log("handleSelectIngredient", this.selectedRecipesGallery);
       } catch (error) {
         console.error(error);
       }
     }
-
-    // async handleSelectSingleRecipe(recipeId) {
-    //   try {
-    //     const result = await axios.get(
-    //       `https://api.spoonacular.com/recipes/${recipeId}/information?apiKey=4974bdff0e5c4c27935b0870139d1e92`
-    //     );
-    //     this.selectedRecipesGallery = result.data;
-    //   } catch (error) {
-    //     console.error(error);
-    //   }
-    // }
   }
 };
 </script>
