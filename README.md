@@ -4,9 +4,9 @@
 
 Recipe Radar is a project built with JavaScript and Vue.js, styled with Bootstrap. Users can search recipes by name, as well as look up recipes by filtering with multiple options. Each recipe includes details such as cooking time and instructions.
 
-Hosted Version: coming soon
+Hosted Version: https://recipes-radar.netlify.app
 
-Work in Porgress 🚧 : Mobile responsiveness
+Work in Porgress 🚧 : Mobile responsiveness and URL link
 
 ## Dependencies:
 
