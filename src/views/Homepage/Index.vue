@@ -227,6 +227,8 @@
   width: 0.6em;
   height: 0.6em;
   border-radius: 50%;
+  accent-color: rgb(121, 139, 101);
+  color: white;
 }
 </style>
 
